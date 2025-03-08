@@ -1,0 +1,10 @@
+{
+  "name": "mini-webpack",
+  "version": "1.0.0",
+  "description": "Write your own webpack.",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "webpack": "../sourcecode/webpack"
+  }
+}
