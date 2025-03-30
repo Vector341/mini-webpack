@@ -5,6 +5,10 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@babel/generator": "^7.27.0",
+    "@babel/parser": "^7.27.0",
+    "@babel/traverse": "^7.27.0",
+    "tapable": "^2.2.1",
     "webpack": "../sourcecode/webpack"
   }
 }

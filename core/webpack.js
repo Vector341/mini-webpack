@@ -1,3 +1,5 @@
+const Compiler = require("./compiler.js");
+
 function webpack(options) {
   const mergeOptions = _mergeOptions(options);
   console.log("mergeOptions", mergeOptions);
