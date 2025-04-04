@@ -4,7 +4,24 @@
 
 ## 编译阶段
 
+创建 compiler
+注册插件
+寻找入口
+
+## 模块编译阶段
+
 入口编译、模块编译
+**数据类型**
+入口文件和模块文件没有区别，它们最终都被编译为模块
+
+```typescript
+type module = {
+  id: Path; // 模块id
+  dependencies: Set<Path>; // 依赖模块
+  name: string[]; // 所属 chunk
+  _source: string; // 模块编译后的源代码
+};
+```
 
 ### 难点
 
