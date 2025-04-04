@@ -1,3 +1,6 @@
+参考文章：https://juejin.cn/post/7031546400034947108
+所属专栏：https://juejin.cn/column/7031912597133721631
+
 ## 初始化阶段
 
 完成参数传入
@@ -15,7 +18,7 @@
 入口文件和模块文件没有区别，它们最终都被编译为模块
 
 ```typescript
-type module = {
+type Module = {
   id: Path; // 模块id
   dependencies: Set<Path>; // 依赖模块
   name: string[]; // 所属 chunk
@@ -46,5 +49,17 @@ type Chunk = {
   name: stirng; // 当前入口文件的名称
   entryModule: Module; // 入口文件编译后的对象
   modules: Module[]; // 该入口文件依赖的所有模块对象组成的数组，其中每一个元素的格式和entryModule是一致的。
+};
+```
+
+## 模块生成阶段
+
+将 this.chunks 内容组织为 asset 后输出到磁盘，每个 chunk 生成一份文件
+
+**数据结构**
+
+```typescript
+type Asset = {
+  [filename: string]: string; // filename -> code
 };
 ```

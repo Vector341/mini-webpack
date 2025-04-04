@@ -7,5 +7,5 @@ compiler.run((err, stats) => {
   if (err) {
     console.log("err", err);
   }
-  console.log(stats);
+  console.log(stats.toJson());
 });

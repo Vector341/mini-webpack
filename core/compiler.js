@@ -5,8 +5,7 @@ const generator = require("@babel/generator").default;
 const t = require("@babel/types");
 const fs = require("fs");
 const path = require("path");
-const { toUnixPath } = require("./utils");
-const { tryExtensions } = require("./utils");
+const { toUnixPath, getSourceCode, tryExtensions } = require("./utils");
 
 class Compiler {
   constructor(options) {
@@ -20,7 +19,7 @@ class Compiler {
     this.entries = new Set();
     this.modules = new Set();
     this.chunks = new Set();
-    this.assets = new Set();
+    this.assets = {};
     this.files = new Set();
   }
   run(callback) {
@@ -30,14 +29,13 @@ class Compiler {
       this.hooks.run.call();
       const entry = this.getEntry();
       this.buildEntryModule(entry);
+      // 输出文件
+      this.exportFile(callback);
     } catch (e) {
       console.error(e);
 
       error = e;
     }
-
-    callback(error, stats);
-    // 解析 entry
   }
   /**
    *
@@ -72,9 +70,6 @@ class Compiler {
       // 根据当前入口文件和模块的相互依赖关系，组装成为一个个包含当前入口所有依赖模块的chunk
       this.buildUpChunk(entryName, entryModule);
     });
-    console.log("this.entries", this.entries);
-    console.log("this.modules", this.modules);
-    console.log("this.chunks", this.chunks);
   }
   buildModule(moduleName, modulePath) {
     const originSource = fs.readFileSync(modulePath, "utf-8");
@@ -157,6 +152,35 @@ class Compiler {
       }),
     };
     this.chunks.add(chunk);
+  }
+  exportFile(callback) {
+    const { output } = this.options;
+    this.chunks.forEach((chunk) => {
+      const parsedFilenmame = output.filename.replace(/\[name\]/g, chunk.name);
+      this.assets[parsedFilenmame] = getSourceCode(chunk);
+    });
+    this.hooks.emit.call();
+    const outputPath = path.resolve(this.rootPath, output.path);
+    if (!fs.existsSync(outputPath)) {
+      fs.mkdirSync(outputPath);
+    }
+    this.files = Object.keys(this.assets);
+    this.files.forEach((filename) => {
+      const filePath = path.join(outputPath, filename);
+      fs.writeFileSync(filePath, this.assets[filename]);
+    });
+    this.hooks.done.call();
+    callback(null, {
+      toJson: () => {
+        return {
+          entries: this.entries,
+          modules: this.modules,
+          files: this.files,
+          chunks: this.chunks,
+          assets: this.assets,
+        };
+      },
+    });
   }
 }
 
