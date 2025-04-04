@@ -69,9 +69,12 @@ class Compiler {
       const entryPath = entry[entryName];
       const entryModule = this.buildModule(entryName, entryPath);
       this.entries.add(entryModule);
+      // 根据当前入口文件和模块的相互依赖关系，组装成为一个个包含当前入口所有依赖模块的chunk
+      this.buildUpChunk(entryName, entryModule);
     });
     console.log("this.entries", this.entries);
     console.log("this.modules", this.modules);
+    console.log("this.chunks", this.chunks);
   }
   buildModule(moduleName, modulePath) {
     const originSource = fs.readFileSync(modulePath, "utf-8");
@@ -144,6 +147,16 @@ class Compiler {
     });
 
     return module;
+  }
+  buildUpChunk(entryName, entryObj) {
+    const chunk = {
+      name: entryName,
+      entryModule: entryObj,
+      modules: Array.from(this.modules).filter((m) => {
+        return m.name.includes(entryName);
+      }),
+    };
+    this.chunks.add(chunk);
   }
 }
 
